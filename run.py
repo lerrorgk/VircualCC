@@ -173,6 +173,8 @@ def main():
     parser.add_argument('--sw_monitoring_interval', dest='sw_monitoring_interval', action='store',
                         type=int, default=10000, help="interval of sampling statistics for queue status (default: 10000ns)")
     parser.add_argument('--my_flow', type=int, default=0, help="flow number (default: 1), 0: use coWave experiment flows, 1: use my own flow")
+    parser.add_argument('--traffic_gen_method', dest='traffic_gen_method', action='store', 
+                        default='random', help="method of flow generation (e.g., random/alltoall) (default: random)")
 
     # #### CONWEAVE PARAMETERS ####
     # parser.add_argument('--cwh_extra_reply_deadline', dest='cwh_extra_reply_deadline', action='store',
@@ -259,13 +261,14 @@ def main():
             time=args.simul_time,
             output=os.getcwd() + "/config/" + flow + ".txt"))
 
-        os.system("python ./traffic_gen/traffic_gen.py -c {cdf} -n {n_host} -l {load} -b {bw} -t {time} -o {output}".format(
+        os.system("python ./traffic_gen/traffic_gen.py -c {cdf} -n {n_host} -l {load} -b {bw} -t {time} -o {output} -m {}".format(
             cdf=os.getcwd() + "/traffic_gen/" + args.cdf + ".txt",
             n_host=n_host,
             load=hostload / 100.0,
             bw=args.bw + "G",
             time=args.simul_time,
-            output=os.getcwd() + "/config/" + flow + ".txt"))
+            output=os.getcwd() + "/config/" + flow + ".txt",
+            method=args.traffic_gen_method))
 
     # sanity check - bandwidth
     with open("config/{topo}.txt".format(topo=args.topo), 'r') as f_topo:
@@ -337,7 +340,7 @@ def main():
     # record to history
     simulday = datetime.now().strftime("%m/%d/%y")
     with open("./mix/.history", "a") as history:
-        history.write("{simulday},{config_ID},{cc_mode},{lb_mode},{cwh_tx_expiry_time},{cwh_extra_reply_deadline},{cwh_path_pause_time},{cwh_extra_voq_flush_time},{cwh_default_voq_waiting_time},{pfc},{irn},{has_win},{var_win},{topo},{bw},{cdf},{load},{time}\n".format(
+        history.write("{simulday},{config_ID},{cc_mode},{lb_mode},{cwh_tx_expiry_time},{cwh_extra_reply_deadline},{cwh_path_pause_time},{cwh_extra_voq_flush_time},{cwh_default_voq_waiting_time},{pfc},{irn},{has_win},{var_win},{topo},{bw},{cdf},{load},{time},{traffic_gen_method}\n".format(
             simulday=simulday,
             config_ID=config_ID,
             cc_mode=cc_mode,
@@ -356,6 +359,7 @@ def main():
             cdf=cdf,
             load=netload,
             time=args.simul_time,
+            traffic_gen_method=args.traffic_gen_method
         ))
 
     # 1 BDP calculation

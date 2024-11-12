@@ -98,6 +98,20 @@ if __name__ == "__main__":
 				heapq.heapreplace(host_list, (t + inter_t, src))
 		ofile.seek(0)
 		ofile.write("%d"%n_flow)
+	elif method == "simple_alltoall":
+		n_flow = 0
+		ofile.write("Estimated flows\n")
+		size = int(customRand.rand())
+		if size <= 0:
+			size = 1
+		for src in range(nhost):
+			for dst in range(nhost):
+				if src != dst:
+					n_flow += 1
+					t = random.uniform(base_t, base_t + time)
+					ofile.write("%d %d 3 %d %.9f\n" % (src, dst, size, t * 1e-9))
+		ofile.seek(0)
+		ofile.write("%d" % n_flow)
 	else:
 		print("Method not recognized.")
 	ofile.close()
