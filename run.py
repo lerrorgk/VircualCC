@@ -15,7 +15,7 @@ import argparse
 from datetime import date
 
 # randomID
-random.seed(datetime.now())
+random.seed(int(time.time()))
 MAX_RAND_RANGE = 1000000000
 
 # config template
